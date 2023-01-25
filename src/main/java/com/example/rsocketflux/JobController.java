@@ -2,16 +2,22 @@ package com.example.rsocketflux;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
+import org.springframework.batch.core.JobParameter;
 import org.springframework.batch.core.JobParameters;
 import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+import java.util.Map;
+
 import static com.example.rsocketflux.BatchConfig.JOB_NAME;
+import static java.util.Map.*;
 import static java.util.Objects.requireNonNull;
 import static org.springframework.http.MediaType.ALL_VALUE;
 import static org.springframework.http.MediaType.APPLICATION_JSON_VALUE;
@@ -32,9 +38,9 @@ public class JobController {
     }
 
     @GetMapping(value = "/start", consumes = ALL_VALUE, produces = APPLICATION_JSON_VALUE)
-    private ResponseEntity<Mono<?>> startJob() {
+    public ResponseEntity<Mono<?>> startJob(@AuthenticationPrincipal UserDetails user) {
         try {
-            final var execution = this.jobLauncher.run(this.job, new JobParameters());
+            final var execution = this.jobLauncher.run(this.job, new JobParameters(of("user", new JobParameter<>(user.getUsername(), String.class, false))));
             final var result = new JobStatusMessage();
             result.setId(requireNonNull(execution).getId());
             result.setData(requireNonNull(execution.getStatus().toString()));
@@ -47,7 +53,7 @@ public class JobController {
     }
 
     @GetMapping(value = "/status", consumes = ALL_VALUE, produces = APPLICATION_JSON_VALUE)
-    private ResponseEntity<Mono<?>> getStatusOfLast() {
+    public ResponseEntity<Mono<?>> getStatusOfLast() {
         try {
             final var execution = this.jobRepository.getLastJobExecution(JOB_NAME, new JobParameters());
             final var result = new JobStatusMessage();

@@ -23,8 +23,8 @@ import static org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType.
 @Configuration
 public class BatchConfig {
 
-    public final static String JOB_NAME = "job";
-    public final static String STEP_NAME = "job";
+    public static final String JOB_NAME = "job";
+    public static final String STEP_NAME = "job";
     private final JobListener jobListener;
     private final StepListener stepListener;
 

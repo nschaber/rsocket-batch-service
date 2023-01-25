@@ -1,0 +1,8 @@
+{
+  "properties": [
+    {
+      "name": "spring.rsocket.server.hostname",
+      "type": "java.lang.String",
+      "description": "Hostname for the RSocketRequester to connect to."
+  }
+] }
